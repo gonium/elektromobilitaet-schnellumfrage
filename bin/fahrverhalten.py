@@ -81,3 +81,15 @@ max {:.0f} kWh".format(
       np.max(oeffentlichlader["Stromverbrauch"]),
     )
   )
+
+print("Anzahl Pflichteinbaufälle intelligentes Messsystem: {:d}/{:d}".format(
+  len(daheimlader[daheimlader["Stromverbrauch"] >= 6000].index), 
+  num_answers
+  ))
+
+print("Anzahl optionale Einbaufälle intelligentes Messsystem: {:d}/{:d}".format(
+  len(daheimlader[
+    (daheimlader["Stromverbrauch"] < 6000) &
+    (daheimlader["Stromverbrauch"] >= 2000)
+    ].index), num_answers
+  ))
