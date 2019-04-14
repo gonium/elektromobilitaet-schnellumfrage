@@ -110,8 +110,13 @@ sowiesopflichteinbau = pflichteinbau[
     (pflichteinbau["Elektrisch_Wasser"] == "Ja") |
     (pflichteinbau["Stromerzeugung"] > 0)
   ]
+optionaleinbau = daheimlader[
+    (daheimlader["Stromverbrauch"] < 6000) &
+    (daheimlader["Stromverbrauch"] >= 2000)
+    ]
+
 print("Anzahl Pflichteinbaufaelle intelligentes Messsystem: {:d}/{:d}".format(
-    len(pflichteinbau.index), num_answers
+    len(pflichteinbau.index), len(daheimlader.index)
   ))
 print("... davon Haushalte, die sowieso Pflichteinbaufaelle sind: {:d}".format(
     len(sowiesopflichteinbau.index)
@@ -121,9 +126,23 @@ bekommen: {:d}".format(
     len(pflichteinbau.index) - len(sowiesopflichteinbau.index)
     ))
 
-print("Anzahl optionale Einbaufaelle intelligentes Messsystem: {:d}/{:d}".format(
-  len(daheimlader[
-    (daheimlader["Stromverbrauch"] < 6000) &
-    (daheimlader["Stromverbrauch"] >= 2000)
-    ].index), num_answers
+print("Anzahl optionale Einbaufaelle intelligentes Messsystem: {:d}".format(
+  len(optionaleinbau.index)
   ))
+
+plt.clf()
+# Pie chart, where the slices will be ordered and plotted counter-clockwise:
+labels = 'Wegen PV etc.', 'durch EV', 'Optional'
+sizes = [
+    len(sowiesopflichteinbau.index), 
+    len(pflichteinbau.index) - len(sowiesopflichteinbau.index), 
+    len(optionaleinbau.index)
+    ]
+explode = (0, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+
+fig1, ax1 = plt.subplots()
+ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
+        shadow=False, startangle=90)
+ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+plt.title(r'Daheimlader: Warum bekommt man ein intelligentes Messsystem?')
+plt.savefig("img/einbaufaelle.png", bbox='tight')
