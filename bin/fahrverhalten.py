@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 alldata = pd.read_csv("data/cleanelectric-20190412.csv",delimiter=',')
 
-#print(alldata.head())
+print(alldata.head())
 
 num_answers = alldata['Timestamp'].count()
 daheimlader = alldata[alldata['Daheimladen']=="Ja"]
@@ -67,27 +67,61 @@ plt.title(r'Stromerzeugung und -verbrauch')
 plt.savefig("img/stromverbrauch-stromerzeugung.png")
 
 print("Stromverbrauch Daheimlader: min {:.0f}, avg {:.0f}, \
-max {:.0f} kWh".format(
+median {:.0f}, max {:.0f} kWh".format(
       np.min(daheimlader["Stromverbrauch"]),
       np.mean(daheimlader["Stromverbrauch"]),
+      np.median(daheimlader["Stromverbrauch"]),
       np.max(daheimlader["Stromverbrauch"]),
     )
   )
 
-print("Stromverbrauch Öffentliche Lader: min {:.0f}, avg {:.0f}, \
-max {:.0f} kWh".format(
-      np.min(oeffentlichlader["Stromverbrauch"]),
-      np.mean(oeffentlichlader["Stromverbrauch"]),
-      np.max(oeffentlichlader["Stromverbrauch"]),
+print("Stromerzeugung Daheimlader: min {:.0f}, avg {:.0f}, \
+median {:.0f}, max {:.0f} kWh".format(
+      np.min(daheimlader["Stromerzeugung"]),
+      np.mean(daheimlader["Stromerzeugung"]),
+      np.median(daheimlader["Stromerzeugung"]),
+      np.max(daheimlader["Stromerzeugung"]),
     )
   )
 
-print("Anzahl Pflichteinbaufälle intelligentes Messsystem: {:d}/{:d}".format(
-  len(daheimlader[daheimlader["Stromverbrauch"] >= 6000].index), 
-  num_answers
-  ))
+print(u"Stromverbrauch oeffentliche Lader: min {:.0f}, avg {:.0f}, \
+median {:.0f}, max {:.0f} kWh".format(
+      np.min(oeffentlichlader["Stromverbrauch"]),
+      np.mean(oeffentlichlader["Stromverbrauch"]),
+      np.median(oeffentlichlader["Stromverbrauch"]),
+      np.max(oeffentlichlader["Stromverbrauch"])
+    )
+  )
 
-print("Anzahl optionale Einbaufälle intelligentes Messsystem: {:d}/{:d}".format(
+print(u"Stromerzeugung oeffentliche Lader: min {:.0f}, avg {:.0f}, \
+median {:.0f}, max {:.0f} kWh".format(
+      np.min(oeffentlichlader["Stromerzeugung"]),
+      np.mean(oeffentlichlader["Stromerzeugung"]),
+      np.median(oeffentlichlader["Stromerzeugung"]),
+      np.max(oeffentlichlader["Stromerzeugung"])
+    )
+  )
+
+
+
+pflichteinbau = daheimlader[daheimlader["Stromverbrauch"] >= 6000]
+sowiesopflichteinbau = pflichteinbau[
+    (pflichteinbau["Elektrisch_Heizen"] == "Ja") |
+    (pflichteinbau["Elektrisch_Wasser"] == "Ja") |
+    (pflichteinbau["Stromerzeugung"] > 0)
+  ]
+print("Anzahl Pflichteinbaufaelle intelligentes Messsystem: {:d}/{:d}".format(
+    len(pflichteinbau.index), num_answers
+  ))
+print("... davon Haushalte, die sowieso Pflichteinbaufaelle sind: {:d}".format(
+    len(sowiesopflichteinbau.index)
+  ))
+print("... demnach Anzahl Haushalte, die durch Elektroauto ein IMS \
+bekommen: {:d}".format(
+    len(pflichteinbau.index) - len(sowiesopflichteinbau.index)
+    ))
+
+print("Anzahl optionale Einbaufaelle intelligentes Messsystem: {:d}/{:d}".format(
   len(daheimlader[
     (daheimlader["Stromverbrauch"] < 6000) &
     (daheimlader["Stromverbrauch"] >= 2000)
